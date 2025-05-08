@@ -1,0 +1,35 @@
+logging:
+  level:
+    ROOT: INFO
+
+# ssl configs
+server:
+  port: 60443
+  ssl:
+    # key-store for ssl only
+    enabled: true
+    key-store: '/Users/bishop/Articles/Demo-Projects/certs/ssl/channel-service.p12'
+    key-store-password: 'channel-service!'
+    key-store-type: PKCS12
+    key-alias: 'channel-service'
+
+    # trust-store to trust middleware-service certificate during ssl handshake
+    trust-store: '/Users/bishop/Articles/Demo-Projects/certs/ssl/truststore-middleware-service.p12'
+    trust-store-password: 'mytrustpass'
+    trust-store-type: PKCS12
+    trust-alias: 'middleware'
+
+# enable this if you want to skip host verification during ssl handshake
+http:
+  ssl:
+    skip-hostname-verification: true
+
+# HS256 (symmetric) jwt secret key, base64 encoded: Symmetric - The same secret key is used for both signing and verification
+jwt:
+  secret: "WHg5JGtMcDcjMmdUIXdNelZiTjRxWUBlRnUxekhyTGQ="
+
+urls:
+  signature:
+    transaction: 'https://localhost:65443/api/v1/signature/transaction'
+  jwt:
+    transaction: 'https://localhost:51443/api/v1/jwt/transaction'
