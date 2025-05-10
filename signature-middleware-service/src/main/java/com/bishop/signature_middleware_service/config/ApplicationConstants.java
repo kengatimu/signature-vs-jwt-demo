@@ -10,6 +10,8 @@ public final class ApplicationConstants {
     public static final String CERT_VERIFICATION_ERROR = "422|Certificate Verification Error: ";
     public static final String FIELD_VALIDATION_ERROR = "400|Internal Error: Field Validation Failed. ";
     public static final String DEFAULT_PROCESSING_FAILURE = "400|Internal Error: Could not process the request. ";
+    public static final String DUPLICATE_RECORD = "409|De-Dup! The request is a duplicate and has already been processed.";
+    public static final String DEFAULT_DATABASE_ERROR = "400|Internal Database Error: Error occurred while saving transaction: ";
 
     private ApplicationConstants() {
     }
