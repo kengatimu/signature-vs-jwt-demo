@@ -12,7 +12,6 @@ It includes three Spring Boot services:
 - `jwt-middleware-service`: Validates payloads using JWT
 
 ---
-
 ## Summary
 
 In modern middleware architectures, ensuring that requests are **authentic**, **tamper-proof**, and **verifiable** is critical. This demo compares two widely-used mechanisms and highlights the best choice for **high-throughput transactional systems**.
@@ -29,7 +28,6 @@ In modern middleware architectures, ensuring that requests are **authentic**, **
 - This project demonstrates that **digital signature validation is the preferred approach** for backend middleware. **JWT is suitable as a fallback**, but combining both adds unnecessary complexity and offers no security advantage.
 
 ---
-
 ## Technologies Used
 
 - Java 21
@@ -40,8 +38,7 @@ In modern middleware architectures, ensuring that requests are **authentic**, **
 - PKCS12 keystores/truststores for certificate handling
 
 ---
-
-##️ Service Overview
+## Service Overview
 
 ### 1. `channel-service`
 - Generates and sends transaction requests
@@ -60,7 +57,23 @@ In modern middleware architectures, ensuring that requests are **authentic**, **
 - Parses claims, validates expiry and payload consistency
 
 ---
+## Recommendation
 
+Use the right tool for the job:
+
+- For middleware services that route, verify, and respond to transactional requests:
+  - **Prefer digital signatures.**
+  - They are stateless, strong, and scalable.
+
+- Only use **JWT**:
+  - When digital signatures are not feasible
+  - For systems where the channel cannot handle certificates
+  - For lighter or user-based interactions
+
+- **Do not combine JWT and digital signatures.**
+  - Adding JWT inside a signed payload or vice versa introduces unnecessary redundancy and complexity.
+
+---
 ## Sample JSON Requests
 
 ### ➤ To `channel-service` (JWT or Signature)
@@ -85,7 +98,6 @@ In modern middleware architectures, ensuring that requests are **authentic**, **
 - mvn spring-boot:run
 
 ---
-
 # Related Links
 - Articles by Ken Gatimu: https://medium.com/@kengatimu
 - Linkedin: https://www.linkedin.com/in/kengatimu/
