@@ -2,8 +2,8 @@
 
 This project demonstrates two approaches for securing payloads exchanged between microservices:
 
-1. **Digital Signature** (asymmetric cryptography using certificates)
-2. **JWT (JSON Web Token)** using **HMAC (HS256)** (symmetric shared secret)
+1. **Digital Signature** – Asymmetric cryptography using X.509 certificates
+2. **JWT (JSON Web Token)** – Symmetric key signing using HMAC (HS256)
 
 It includes three Spring Boot services:
 
@@ -15,13 +15,18 @@ It includes three Spring Boot services:
 
 ## Summary
 
-In modern middleware architectures, ensuring that incoming requests are authentic, tamper-proof, and verifiable is critical. This project evaluates **two widely used mechanisms** for achieving that goal and outlines which is best suited for **high-throughput** environments.
+In modern middleware architectures, ensuring that requests are **authentic**, **tamper-proof**, and **verifiable** is critical. This demo compares two widely-used mechanisms and highlights the best choice for **high-throughput transactional systems**.
 
-- **Digital Signature** offers strong guarantees for authenticity, integrity, and non-repudiation without needing token issuance or state tracking. It's ideal for middleware systems that process sensitive transactional data.
-  
-- **JWT with HMAC (HS256)**, while stateless and convenient, requires shared secrets, introduces token parsing and expiry management, and lacks non-repudiation. It's best used for simple, user-facing or authentication scenarios.
+### Digital Signature
+- Ensures **authenticity, integrity, and non-repudiation**
+- Stateless, scalable, and ideal for secure backend middleware
 
-This demo proves that **digital signature validation is the preferred approach** for backend middleware, with **JWT as a fallback** if signature integration is not feasible. Using **both (JWT over signature)** is considered bad design—offering no additional security and increasing complexity.
+### JWT (HS256)
+- Lightweight and stateless
+- Requires shared secret, expiry management
+- Lacks non-repudiation and can introduce token complexity
+ 
+- This project demonstrates that **digital signature validation is the preferred approach** for backend middleware. **JWT is suitable as a fallback**, but combining both adds unnecessary complexity and offers no security advantage.
 
 ---
 
@@ -31,59 +36,58 @@ This demo proves that **digital signature validation is the preferred approach**
 - Spring Boot 3
 - Maven
 - Apache HttpClient (with mTLS)
-- JJWT 0.11.x (for JWT)
-- PKCS12 keystores and truststores for certificate handling
+- JJWT 0.11.x
+- PKCS12 keystores/truststores for certificate handling
 
 ---
 
-## Service Overview
+##️ Service Overview
 
-### 1. channel-service
-- Generates and sends requests to the middleware.
+### 1. `channel-service`
+- Generates and sends transaction requests
 - Supports:
   - Digital signatures via `.p12` keystore
-  - JWT generation using a shared HMAC secret
-- Communicates over HTTPS using mutual TLS
+  - JWT generation via shared HMAC secret
+- Communicates via HTTPS with mutual TLS
 
-### 2. signature-middleware-service
-- Verifies digital signatures using a trusted certificate.
-- Extracts public keys from a truststore based on the channel identifier.
-- Performs signature verification on a canonical "clear text" string.
+### 2. `signature-middleware-service`
+- Verifies signatures using trusted X.509 certificates
+- Retrieves public certificate by `channelId`
+- Performs canonical string generation and signature validation
 
-### 3. jwt-middleware-service
-- Verifies JWT tokens using a shared HMAC secret.
-- Parses token claims and validates them against the request payload.
-- Checks token expiry and ensures token integrity.
-
----
-
-## Recommendation
-
-Use the right tool for the job:
-
-- For middleware services that route, verify, and respond to transactional requests:
-  - **Prefer digital signatures.**
-  - They are stateless, strong, and scalable.
-
-- Only use **JWT**:
-  - When digital signatures are not feasible
-  - For systems where the channel cannot handle certificates
-  - For lighter or user-based interactions
-
-- **Do not combine JWT and digital signatures.**
-  - Adding JWT inside a signed payload or vice versa introduces unnecessary redundancy and complexity.
+### 3. `jwt-middleware-service`
+- Verifies JWT tokens via shared HMAC secret
+- Parses claims, validates expiry and payload consistency
 
 ---
 
-## Future Extension
+## Sample JSON Requests
 
-Currently, only **HMAC (HS256)** JWT implementation is included. RS256 (asymmetric JWT) can be implemented for comparison, though it offers fewer benefits in middleware use cases when digital signatures are already available.
+### ➤ To `channel-service` (JWT or Signature)
+
+```json
+{
+  "rrn": "TX99887700",
+  "senderName": "John Doe",
+  "receiverName": "Jane Smith",
+  "amount": 1500.00,
+  "feeAmount": "0.00",
+  "currency": "KES",
+  "narration": "Family support"
+}
+
+```
+---
+# How to run project locally
+- git clone https://github.com/kengatimu/signature-vs-jwt-demo.git
+- cd signature-vs-jwt-demo
+- mvn clean install
+- mvn spring-boot:run
 
 ---
 
-## Running the Project
+# Related Links
+- Articles by Ken Gatimu: https://medium.com/@kengatimu
+- Linkedin: https://www.linkedin.com/in/kengatimu/
 
-Each service can be started independently using Maven:
-
-```bash
-mvn spring-boot:run
+---
